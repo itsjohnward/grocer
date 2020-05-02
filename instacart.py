@@ -11,37 +11,6 @@ from selenium.common.exceptions import NoSuchElementException
 #         self.
 
 
-def find_by_text(browser, text):
-    return browser.find_elements_by_xpath("//*[text()='{}']".format(text))
-
-
-def is_date(text):
-    return (
-        "Monday" in text
-        or "Tuesday" in text
-        or "Wednesday" in text
-        or "Thursday" in text
-        or "Friday" in text
-        or "Saturday" in text
-        or "Sunday" in text
-    )
-
-
-def is_time(text):
-    return " - " in text and ("am" in text or "pm" in text)
-
-
-def is_money(text):
-    return "$" in text
-
-
-def get_browser(headless=False):
-    opts = Options()
-    if headless:
-        opts.set_headless()
-    return Chrome("/Users/john/csci-e-29/grocer/chromedriver", options=opts)
-
-
 def load_site(browser):
     browser.get("https://instacart.com")
     sleep(5)
@@ -102,15 +71,6 @@ def detect_no_deliveries(browser):
         return True
     except:
         return False
-
-
-def get_child_text(element):
-    for elem in element.find_elements_by_xpath(".//*"):
-        yield elem.text
-
-
-def get_parent(element):
-    return element.find_elements_by_xpath("..")[0]
 
 
 def detect_delivery_times(browser):
