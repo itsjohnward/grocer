@@ -13,6 +13,7 @@ csci-utils = {editable = true,git = "https://github.com/csci-e-29/2020sp-csci-ut
 toolz = "*"
 dask = "*"
 fsspec = "*"
+django = "*"
 
 [requires]
 python_version = "3.8"
