@@ -3,7 +3,11 @@ from time import sleep
 
 from luigi import Task
 from luigi.util import inherits
-from csci_utils.luigi.task import Requires, Requirement
+from csci_utils.luigi.dask.target import ParquetTarget
+from csci_utils.luigi.task import Requires, Requirement, TargetOutput
+from selenium.common.exceptions import NoSuchElementException
+import pandas as pd
+import dask.dataframe as dd
 
 from .targets import (
     BrowserOpenTarget,
@@ -12,7 +16,8 @@ from .targets import (
     StoreFrontTarget,
     DeliveryTimesModalTarget,
 )
-from utils.browser_utils import get_browser
+from grocer.utils.browser_utils import get_browser, find_by_text, get_parent
+from grocer.utils.str_utils import is_date, is_time, is_money
 
 browser = get_browser()
 
@@ -88,9 +93,9 @@ class DeliveryTimesModal(Task):
 
 
 @inherits(DeliveryTimesModal)
-class DeliveryTimesModal(Task):
+class GetDeliveryTimes(Task):
     requires = Requires()
-    main_page = Requirement(StoreFront)
+    main_page = Requirement(DeliveryTimesModal)
     output = TargetOutput(
         file_pattern=os.path.join("data", "delivery_times", ""),
         ext=".parquet",
@@ -98,27 +103,48 @@ class DeliveryTimesModal(Task):
     )
 
     def run(self):
-        self.output().write_dask(
-            average_text_length_by_something(reviews, "decade"), compression="gzip",
-        )
+        # self.detect_load_more_times_button()
+        if self.detect_no_deliveries():
+            self.output().write_dask(dd.from_pandas(pd.DataFrame([]), chunksize=1))
+        else:
+            self.output().write_dask(
+                dd.from_pandas(self.detect_delivery_times(), chunksize=1)
+            )
 
-    def detect_delivery_times(browser):
+    def detect_delivery_times(self):
         header = find_by_text(browser, "Available Scheduled Times")[0]
         section = get_parent(get_parent(header))
-        return parse_delivery_times(section.text)
+        return pd.DataFrame(self.parse_delivery_times(section.text))
 
-    def parse_delivery_times(text):
-        delivery_times = {}
+    def parse_delivery_times(self, text):
+        delivery_times = []
         for line in text.splitlines():
             if is_date(line):
-                delivery_times[line] = {}
                 date = line
             if is_time(line):
-                delivery_times[date][line] = None
-                time = line
+                delivery_times.append({"date": date, "time": line})
             if is_money(line):
-                delivery_times[date][time] = line
+                delivery_times[-1]["price"] = line
         return delivery_times
+
+    def detect_load_more_times_button(self):
+        while True:
+            try:
+                button = browser.find_element_by_xpath('//button[text()="More times"]')
+                print(button)
+                button.click()
+                sleep(5)
+            except NoSuchElementException:
+                return
+
+    def detect_no_deliveries(self):
+        try:
+            browser.find_element_by_css_selector(
+                'img[alt="All delivery windows are full"]'
+            )
+            return True
+        except:
+            return False
 
     def print_results(self):
         print(self.output().read_dask().compute())

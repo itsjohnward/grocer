@@ -1,10 +1,10 @@
 from functools import partial
 
 from luigi import Target
-from utils.browser_utils import get_browser, find_by_text
+from grocer.utils.browser_utils import get_browser, find_by_text
 from selenium.common.exceptions import NoSuchElementException
 
-
+# TODO: generalize GroceryTarget and Page anchors
 class InstacartTarget(Target):
     def __init__(self, browser, *args, **kwargs):
         self.browser = browser
@@ -60,4 +60,4 @@ class StoreFrontTarget(InstacartTarget):
 
 class DeliveryTimesModalTarget(InstacartTarget):
     def exists(self):
-        return len(find_by_text(browser, "Available Scheduled Times") > 0)
+        return len(find_by_text(self.browser, "Available Scheduled Times")) > 0
