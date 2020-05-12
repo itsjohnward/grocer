@@ -22,7 +22,7 @@ $ grocer <store> <action>
 For example:
 
 ```sh
-$ grocer instacart times
+$ grocer wegmans times
                   date         time  price
 index                                     
 0       Monday, May 11    4pm - 6pm  $5.99
