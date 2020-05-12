@@ -2,7 +2,6 @@ from unittest import TestCase
 from utils import str_utils
 
 
-
 # Confirm that tox and pytest are running tests as expected
 class TestingSuiteTest(TestCase):
     def test_pytest_config(self):
