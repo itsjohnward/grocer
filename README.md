@@ -41,7 +41,7 @@ For example:
 from grocer import GrocerClient
 
 # Create a client instance
-client = GrocerClient(merchant="instacart", email="example@example.com", password="password")
+client = GrocerClient(merchant="wegmans", email="example@example.com", password="password")
 
 # Call client methods
 print(client.get_delivery_times())
