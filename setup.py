@@ -21,7 +21,7 @@ setuptools.setup(
         "selenium",
         "luigi[toml]",
         "dask",
-        "csci-utils @ git+ssh://git@github.com/csci-e-29/2020sp-csci-utils-itsjohnward.git@v1.2.1#egg=csci-utils",
+        "csci-utils @ git+https://github.com/csci-e-29/2020sp-csci-utils-itsjohnward.git@v1.2.1#egg=csci-utils",
     ],
     # root must be current directory
     # otherwise, use_scm_version = {"root": path, "relative_to": __file__}

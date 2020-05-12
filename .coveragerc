@@ -1,0 +1,20 @@
+[paths]
+source =
+   grocer
+   */site-packages
+
+[run]
+branch = true
+source = grocer
+parallel = true
+
+[report]
+show_missing = true
+precision = 2
+omit =
+    */tests.py
+    */test_*.py
+    */*_test.py
+    */__*__.py
+    */cli.py
+    setup.py

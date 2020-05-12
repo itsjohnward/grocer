@@ -1,0 +1,28 @@
+language: python
+python: 3.7
+dist: xenial
+
+install:
+    - echo -e "machine github.com\n  login $CI_USER_TOKEN" > ~/.netrc
+    - pip install pipenv
+    - pipenv install --system --dev --skip-lock
+    - wget https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip && unzip chromedriver_linux64.zip
+
+jobs:
+    include:
+        - stage: test
+          before_script: # code coverage tool
+              - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+              - chmod +x ./cc-test-reporter
+              - ./cc-test-reporter before-build
+          script: pytest --cov-report xml --cov-report term
+          after_script:
+              - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+        - stage: integration
+          script:
+              - grocer
+
+stages:
+    - name: test
+    - name: integration
+      if: branch = master
