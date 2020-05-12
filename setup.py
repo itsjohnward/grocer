@@ -20,9 +20,7 @@ setuptools.setup(
     install_requires=[
         "selenium",
         "luigi[toml]",
-        "toolz",
         "dask",
-        "fsspec",
         "csci-utils @ git+ssh://git@github.com/csci-e-29/2020sp-csci-utils-itsjohnward.git#egg=csci-utils",
     ],
     # root must be current directory
