@@ -2,7 +2,7 @@ import argparse
 
 import luigi
 
-from .wegmans.tasks import GetDeliveryTimes
+from . import GrocerClient
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     parser.add_argument("-p", "--password", action="store", type=str)
     args = parser.parse_args()
 
+    client = GrocerClient(args.merchant, args.email, args.password)
+
     if args.action == "times":
-        delivery_times = GetDeliveryTimes()
-        luigi.build([delivery_times], local_scheduler=True)
-        delivery_times.print_results()
+        print(client.get_delivery_times())
