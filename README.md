@@ -9,8 +9,8 @@
 
 ## Install
 
-```py
-pip install git+https://github.com/itsjohnward/grocer.git
+```sh
+$ pip install git+https://github.com/itsjohnward/grocer.git
 ```
 
 ## Use from the command line
