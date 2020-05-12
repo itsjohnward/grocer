@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from utils import str_utils
+from .utils import str_utils
 
 
 # Confirm that tox and pytest are running tests as expected
