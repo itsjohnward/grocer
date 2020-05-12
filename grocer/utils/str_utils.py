@@ -1,5 +1,5 @@
 def is_date(text):
-    return (
+    return isinstance(text, str) and (
         "Monday" in text
         or "Tuesday" in text
         or "Wednesday" in text
@@ -11,8 +11,8 @@ def is_date(text):
 
 
 def is_time(text):
-    return " - " in text and ("am" in text or "pm" in text)
+    return isinstance(text, str) and " - " in text and ("am" in text or "pm" in text)
 
 
 def is_money(text):
-    return "$" in text
+    return isinstance(text, str) and "$" in text
