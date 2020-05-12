@@ -13,6 +13,20 @@
 $ pip install git+https://github.com/itsjohnward/grocer.git
 ```
 
+### Getting a ChomeDriver
+
+1. Download ChromeDriver from here https://chromedriver.storage.googleapis.com/index.html?path=83.0.4103.39/
+2. Set an environment variable pointing to where you downloaded it. i.e. `export CHROMEDRIVER_PATH=/Users/john/csci-e-29/grocer/chromedriver`
+
+### Setting up account info
+
+Set your instacart username and password as environment variables like so:
+
+```sh
+export EMAIL=example@example.com
+export PASSWORD=password
+```
+
 ## Use from the command line
 
 ```sh
