@@ -7,13 +7,16 @@ from selenium.webdriver.chrome.options import Options
 BROWSER_REGISTRY = {}
 
 
-def get_browser(merchant, headless=False):
+def get_browser(merchant, headless=False, no_sandbox=False):
     # TODO support multiple concurrent users
     if merchant in BROWSER_REGISTRY:
         return BROWSER_REGISTRY[merchant]
     opts = Options()
     if headless:
         opts.set_headless()
+    if no_sandbox:
+        opts.add_argument("--no-sandbox")
+        opts.add_argument("--disable-dev-shm-usage")
     browser = Chrome(os.environ["CHROMEDRIVER_PATH"], options=opts)
     # save the browser instance in a registry so it can be re-used
     BROWSER_REGISTRY[merchant] = browser
