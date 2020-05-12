@@ -20,7 +20,7 @@ jobs:
               - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
         - stage: integration
           script:
-              - grocer
+              - grocer wegmans times
 
 stages:
     - name: test
