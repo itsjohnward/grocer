@@ -1,13 +1,16 @@
 from functools import partial
+import os
 
 from luigi import Target
 from grocer.utils.browser_utils import get_browser, find_by_text
 from selenium.common.exceptions import NoSuchElementException
 
+from grocer.utils.browser_utils import get_browser
+
 # TODO: generalize GroceryTarget and Page anchors
 class InstacartTarget(Target):
-    def __init__(self, browser, *args, **kwargs):
-        self.browser = browser
+    def __init__(self, merchant, *args, **kwargs):
+        self.merchant_name = merchant
         super().__init__(*args, **kwargs)
 
     def exists(self):
@@ -24,40 +27,44 @@ class InstacartTarget(Target):
 
 class BrowserOpenTarget(InstacartTarget):
     def exists(self):
-        print("BrowserOpenTarget", self.browser.current_url)
-        return self.browser.current_url == "https://www.instacart.com/"
+        browser = get_browser(merchant=self.merchant_name)
+        return browser.current_url == "https://www.instacart.com/"
 
 
 class WelcomePageTarget(InstacartTarget):
     def exists(self):
+        browser = get_browser(merchant=self.merchant_name)
         return (
-            len(find_by_text(self.browser, "Already have an account?")) > 0
-            and len(find_by_text(self.browser, "Log in")) > 0
+            len(find_by_text(browser, "Already have an account?",)) > 0
+            and len(find_by_text(browser, "Log in")) > 0
         )
 
 
 class LoginPageTarget(InstacartTarget):
     def exists(self):
+        browser = get_browser(merchant=self.merchant_name)
         return (
-            len(find_by_text(self.browser, "Welcome back")) > 0
-            and len(find_by_text(self.browser, "Log in")) > 0
+            len(find_by_text(browser, "Welcome back",)) > 0
+            and len(find_by_text(browser, "Log in")) > 0
         )
 
 
 class LoggedInTarget(InstacartTarget):
     def exists(self):
+        browser = get_browser(merchant=self.merchant_name)
         # A log out button exists
-        return len(find_by_text(self.browser, "Log out")) > 0
+        return len(find_by_text(browser, "Log out")) > 0
 
 
 class StoreFrontTarget(InstacartTarget):
     def exists(self):
+        browser = get_browser(merchant=self.merchant_name)
         return (
-            self.browser.current_url
-            == "https://www.instacart.com/store/wegmans/storefront"
+            browser.current_url == "https://www.instacart.com/store/wegmans/storefront"
         )
 
 
 class DeliveryTimesModalTarget(InstacartTarget):
     def exists(self):
-        return len(find_by_text(self.browser, "Available Scheduled Times")) > 0
+        browser = get_browser(merchant=self.merchant_name)
+        return len(find_by_text(browser, "Available Scheduled Times",)) > 0

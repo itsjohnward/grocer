@@ -1,16 +1,27 @@
+import os
+
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 
 
-def find_by_text(browser, text):
-    return browser.find_elements_by_xpath("//*[text()='{}']".format(text))
+BROWSER_REGISTRY = {}
 
 
-def get_browser(headless=False):
+def get_browser(merchant, headless=False):
+    # TODO support multiple concurrent users
+    if merchant in BROWSER_REGISTRY:
+        return BROWSER_REGISTRY[merchant]
     opts = Options()
     if headless:
         opts.set_headless()
-    return Chrome("/Users/john/csci-e-29/grocer/chromedriver", options=opts)
+    browser = Chrome(os.environ["CHROMEDRIVER_PATH"], options=opts)
+    # save the browser instance in a registry so it can be re-used
+    BROWSER_REGISTRY[merchant] = browser
+    return browser
+
+
+def find_by_text(browser, text):
+    return browser.find_elements_by_xpath("//*[text()='{}']".format(text))
 
 
 def get_children(element):
