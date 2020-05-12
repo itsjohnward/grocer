@@ -19,7 +19,6 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=[
         "selenium",
-        "ipython",
         "luigi[toml]",
         "toolz",
         "dask",
