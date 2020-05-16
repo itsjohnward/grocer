@@ -46,6 +46,12 @@ class LoginPage(Task):
         sleep(5)
 
 
+def close_trial_prompt():
+    buttons = find_by_text(get_browser(merchant=MERCHANT_NAME), "Got it, Thanks",)
+    if len(buttons) > 0:
+        buttons[0].click()
+
+
 @inherits(LoginPage)
 class LoggedIn(Task):
     requires = Requires()
@@ -67,7 +73,9 @@ class LoggedIn(Task):
         buttons = browser.find_elements_by_css_selector("button")
         login_button = buttons[2]
         login_button.click()
-        sleep(15)  # TODO: random delays
+        sleep(28)  # TODO: random delays
+        close_trial_prompt()
+        sleep(5)
 
 
 @inherits(LoggedIn)
@@ -80,6 +88,8 @@ class StoreFront(Task):
         get_browser(merchant=MERCHANT_NAME).get(
             "https://www.instacart.com/store/wegmans/storefront"
         )
+        sleep(29)
+        close_trial_prompt()
         sleep(5)
 
 
@@ -91,10 +101,12 @@ class DeliveryTimesModal(Task):
 
     def run(self):
         cart_button = get_browser(merchant=MERCHANT_NAME).find_element_by_css_selector(
-            'a[href="/wegmans/info?tab=delivery"]'
+            'a[href="/wegmans/info?tab=info"]'
         )
         cart_button.click()
-        sleep(10)
+        sleep(12)
+        find_by_text(get_browser(merchant=MERCHANT_NAME), "Delivery times",)[0].click()
+        sleep(8)
 
 
 # Actions
@@ -115,7 +127,7 @@ class GetDeliveryTimes(Task):
     )
 
     def run(self):
-        # self.detect_load_more_times_button()
+        self.detect_load_more_times_button()
         if self.detect_no_deliveries():
             self.output().write_dask(dd.from_pandas(pd.DataFrame([]), chunksize=1))
         else:
