@@ -53,7 +53,14 @@ class LoggedInTarget(InstacartTarget):
     def exists(self):
         browser = get_browser(merchant=self.merchant_name)
         # A log out button exists
-        return len(find_by_text(browser, "Log out")) > 0
+        return len(find_by_text(browser, "Log Out")) > 0
+
+
+class TrialPromptClosedTarget(InstacartTarget):
+    def exists(self):
+        browser = get_browser(merchant=self.merchant_name)
+        # The trial prompt is not displayed
+        return len(find_by_text(browser, "Got it, Thanks")) == 0
 
 
 class StoreFrontTarget(InstacartTarget):
@@ -64,7 +71,17 @@ class StoreFrontTarget(InstacartTarget):
         )
 
 
-class DeliveryTimesModalTarget(InstacartTarget):
+class InfoModalTarget(InstacartTarget):
+    def exists(self):
+        browser = get_browser(merchant=self.merchant_name)
+        return (
+            (len(find_by_text(browser, "Info",)) > 0)
+            & (len(find_by_text(browser, "Delivery times",)) > 0)
+            & (len(find_by_text(browser, "Pickup times",)) > 0)
+        )
+
+
+class InfoModalDeliveryTimesTarget(InstacartTarget):
     def exists(self):
         browser = get_browser(merchant=self.merchant_name)
         return len(find_by_text(browser, "Available Scheduled Times",)) > 0
