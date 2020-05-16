@@ -14,7 +14,9 @@ from .targets import (
     LoginPageTarget,
     LoggedInTarget,
     StoreFrontTarget,
-    DeliveryTimesModalTarget,
+    TrialPromptClosedTarget,
+    InfoModalTarget,
+    InfoModalDeliveryTimesTarget,
 )
 from grocer.utils.browser_utils import get_browser, find_by_text, get_parent
 from grocer.utils.str_utils import is_date, is_time, is_money, get_time_window
@@ -67,7 +69,7 @@ class LoggedIn(Task):
         buttons = browser.find_elements_by_css_selector("button")
         login_button = buttons[2]
         login_button.click()
-        sleep(15)  # TODO: random delays
+        sleep(14)  # TODO: random delays
 
 
 @inherits(LoggedIn)
@@ -80,30 +82,56 @@ class StoreFront(Task):
         get_browser(merchant=MERCHANT_NAME).get(
             "https://www.instacart.com/store/wegmans/storefront"
         )
-        sleep(5)
+        sleep(14)
 
 
 @inherits(StoreFront)
-class DeliveryTimesModal(Task):
+class CloseTrialPrompt(Task):
+    requires = Requires()
+    store_front = Requirement(StoreFront)
+    output = TrialPromptClosedTarget(merchant=MERCHANT_NAME)
+
+    def run(self):
+        buttons = find_by_text(get_browser(merchant=MERCHANT_NAME), "Got it, Thanks",)
+        if len(buttons) > 0:
+            buttons[0].click()
+            sleep(2)
+
+
+@inherits(StoreFront)
+@inherits(CloseTrialPrompt)
+class InfoModal(Task):
     requires = Requires()
     main_page = Requirement(StoreFront)
-    output = DeliveryTimesModalTarget(merchant=MERCHANT_NAME)
+    trial_prompt_closed = Requirement(CloseTrialPrompt)
+    output = InfoModalTarget(merchant=MERCHANT_NAME)
 
     def run(self):
         cart_button = get_browser(merchant=MERCHANT_NAME).find_element_by_css_selector(
-            'a[href="/wegmans/info?tab=delivery"]'
+            'a[href="/wegmans/info?tab=info"]'
         )
         cart_button.click()
-        sleep(10)
+        sleep(7)
+
+
+@inherits(InfoModal)
+class InfoModalDeliveryTimes(Task):
+    requires = Requires()
+    info_modal = Requirement(InfoModal)
+    output = InfoModalDeliveryTimesTarget(merchant=MERCHANT_NAME)
+
+    def run(self):
+        find_by_text(get_browser(merchant=MERCHANT_NAME), "Delivery times",)[0].click()
+        sleep(8)
 
 
 # Actions
 
 
-@inherits(DeliveryTimesModal)
+@inherits(InfoModalDeliveryTimes)
 class GetDeliveryTimes(Task):
     requires = Requires()
-    main_page = Requirement(DeliveryTimesModal)
+    main_page = Requirement(InfoModalDeliveryTimes)
 
     # get_time_window() makes sure we don't run this more than once every 5 minutes
     output = TargetOutput(
@@ -115,6 +143,7 @@ class GetDeliveryTimes(Task):
     )
 
     def run(self):
+        # Commented out because it significantly increases run time
         # self.detect_load_more_times_button()
         if self.detect_no_deliveries():
             self.output().write_dask(dd.from_pandas(pd.DataFrame([]), chunksize=1))
@@ -147,7 +176,6 @@ class GetDeliveryTimes(Task):
                 button = get_browser(merchant=MERCHANT_NAME).find_element_by_xpath(
                     '//button[text()="More times"]'
                 )
-                print(button)
                 button.click()
                 sleep(5)
             except NoSuchElementException:
